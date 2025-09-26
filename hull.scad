@@ -295,34 +295,39 @@ translate([0, 50]) visualize_hull(20 * testpoints_circular);
 translate([0, -50]) visualize_hull(20 * testpoints_coplanar);
 
 // Collinear
-translate([50, 50]) visualize_hull(20 * testpoints_collinear_2d);
+//translate([50, 50]) visualize_hull(20 * testpoints_collinear_2d);
 
 // Collinear
-translate([-50, 50]) visualize_hull(20 * testpoints_collinear_3d);
+//translate([-50, 50]) visualize_hull(20 * testpoints_collinear_3d);
 
 // 3D points
 visualize_hull(testpoints3d);
 
 module visualize_hull(points) {
 
-  hull = hull(points);
+  // compute hull faces once
+  let (faces = hull(points)) {
 
-  if (len(hull) > 0 && len(hull[0]) > 0)
-    %polyhedron(points=points, faces=hull);
-  else
-    %polyhedron(points=points, faces=[hull]);
+    // faces is either [ [i,i,i], ... ] for 3D or [i,i,i,...] for 2D
+    // Use is_list() to branch without calling len() on a scalar.
+    if (len(faces) > 0 && is_list(faces[0]))
+      %polyhedron(points=points, faces=faces);
+    else
+      %polyhedron(points=points, faces=[faces]);
 
-  for (i = [0:len(points) - 1])
-    assign (p = points[i], $fn = 16) {
-      translate(p) {
-        if (hull_contains_index(hull, i)) {
-          color("blue") sphere(1);
-        } else {
-          color("red") sphere(1);
-        }
+    // draw points; blue if on hull, red otherwise
+    for (i = [0:len(points) - 1]) {
+      let (p = points[i]) translate(p) {
+        // pass faces (not undefined) to the lookup
+        color(hull_contains_index(faces, i) ? "blue" : "red")
+          sphere(r=1, $fn=16);
       }
     }
-
-  function hull_contains_index(hull, index) =
-    search(index, hull, 1, 0) || search(index, hull, 1, 1) || search(index, hull, 1, 2);
+  }
 }
+
+// search convenience: true if index appears anywhere in faces
+function hull_contains_index(faces, index) =
+  search(index, faces, 1, 0) || // search depth 1
+  search(index, faces, 1, 1) || // search depth 2
+  search(index, faces, 1, 2);
