@@ -295,33 +295,39 @@ translate([0, 50]) visualize_hull(20 * testpoints_circular);
 translate([0, -50]) visualize_hull(20 * testpoints_coplanar);
 
 // Collinear
-//translate([50, 50]) visualize_hull(20 * testpoints_collinear_2d);
+translate([50, 50]) visualize_hull(20 * testpoints_collinear_2d);
 
 // Collinear
-//translate([-50, 50]) visualize_hull(20 * testpoints_collinear_3d);
+translate([-50, 50]) visualize_hull(20 * testpoints_collinear_3d);
 
 // 3D points
 visualize_hull(testpoints3d);
-
 module visualize_hull(points) {
-
-  // compute hull faces once
   let (faces = hull(points)) {
 
-    // faces is either [ [i,i,i], ... ] for 3D or [i,i,i,...] for 2D
-    // Use is_list() to branch without calling len() on a scalar.
-    if (len(faces) > 0 && is_list(faces[0]))
+    if (len(faces) == 0) {
+      // nothing
+    } else if (is_list(faces[0])) {
+      // 3D hull (triangles)
       %polyhedron(points=points, faces=faces);
-    else
+    } else if (len(faces) >= 3) {
+      // 2D hull (polygon)
       %polyhedron(points=points, faces=[faces]);
+    } else if (len(faces) == 2) {
+      // Collinear case, draw a rod
+      p0 = points[faces[0]];
+      p1 = points[faces[1]];
+      hull() {
+        translate(p0) sphere(r=0.8, $fn=24);
+        translate(p1) sphere(r=0.8, $fn=24);
+      }
+    }
 
-    // draw points; blue if on hull, red otherwise
+    // Draw all points
     for (i = [0:len(points) - 1]) {
-      let (p = points[i]) translate(p) {
-        // pass faces (not undefined) to the lookup
+      translate(points[i])
         color(hull_contains_index(faces, i) ? "blue" : "red")
           sphere(r=1, $fn=16);
-      }
     }
   }
 }
@@ -331,3 +337,18 @@ function hull_contains_index(faces, index) =
   search(index, faces, 1, 0) || // search depth 1
   search(index, faces, 1, 1) || // search depth 2
   search(index, faces, 1, 2);
+
+// Collinear case: draw a rod between two hull points
+module visualize_segment_hull(points, indices) {
+  p0 = points[indices[0]];
+  p1 = points[indices[1]];
+  hull() {
+    translate(p0) sphere(r=0.8, $fn=24);
+    translate(p1) sphere(r=0.8, $fn=24);
+  }
+}
+
+// Degenerate case: only one hull point
+module visualize_point_hull(points, idx) {
+  translate(points[idx]) color("gray") sphere(r=0.8, $fn=24);
+}
