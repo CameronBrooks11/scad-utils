@@ -1,11 +1,12 @@
 // ============================================================================
 // Convex Hull Utilities (2D and 3D)
 // ----------------------------------------------------------------------------
-// This implementation calculates convex hulls for 2D or 3D point sets.
+// Computes convex hulls for 2D or 3D point sets.
+//
 // - 2D: returns polygon vertex indices [i1, i2, i3, ...]
 // - 3D: returns triangular face indices [[i1,i2,i3], [i2,i3,i4], ...]
 // - Collinear: returns the two extreme endpoints [i_min, i_max]
-// ----------------------------------------------------------------------------
+//
 // Notes:
 //   * Uses let() and list comprehensions
 //   * Relies on bug-fixed search()
@@ -14,7 +15,7 @@
 
 epsilon = 1e-9;
 
-// --- Entry point ------------------------------------------------------------
+// --- Entry Point ------------------------------------------------------------
 function hull(points) =
   (len(points) == 0) ? []
   : (len(points[0]) == 2) ? convexhull2d(points)
@@ -30,9 +31,7 @@ function convexhull2d(points) =
   ) (c == len(points)) ? convexhull_collinear(points)
   : let (
     remaining = [for (i = [2:len(points) - 1]) if (i != c) i],
-    polygon = (area_2d(points[a], points[b], points[c]) > 0) ?
-      [a, b, c]
-    : [b, a, c]
+    polygon = (area_2d(points[a], points[b], points[c]) > 0) ? [a, b, c] : [b, a, c]
   ) convex_hull_iterative_2d(points, polygon, remaining);
 
 function convex_hull_iterative_2d(points, polygon, remaining, i_ = 0) =
@@ -65,25 +64,43 @@ function remove_conflicts_and_insert_point(polygon, conflicts, point) =
 // --- 3D Convex Hull ---------------------------------------------------------
 function convexhull3d(points) =
   (len(points) < 3) ? [for (i = [0:1:len(points) - 1]) i]
+  : is_collinear3(points) ?
+    convexhull_collinear(points)
   : let (
     a = 0,
     b = 1,
-    c = 2,
+    c = find_first_noncollinear3([a, b], points, 2),
     pl = plane(points, a, b, c),
-    d = find_first_noncoplanar(pl, points, 3)
+    d = find_first_noncoplanar(pl, points, 0)
   ) (d == len(points)) ?
-    // all coplanar: project to 2D hull
-    let (
-      pts2d = [for (p = points) plane_project(p, points[a], points[b], points[c])]
-    ) convexhull2d(pts2d)
+    // all coplanar → project to 2D
+    let (pts2d = [for (p = points) plane_project(p, points[a], points[b], points[c])]) convexhull2d(pts2d)
   : let (
-    remaining = [for (i = [3:len(points) - 1]) if (i != d) i],
+    // build initial tetrahedron
+    remaining = [for (i = [0:len(points) - 1]) if (i != a && i != b && i != c && i != d) i],
     bc = in_front(pl, points[d]) ? [c, b] : [b, c],
     b2 = bc[0],
     c2 = bc[1],
     tris = [[a, b2, c2], [d, b2, a], [c2, d, a], [b2, d, c2]],
     planes = [for (t = tris) plane(points, t[0], t[1], t[2])]
   ) convex_hull_iterative(points, tris, planes, remaining);
+
+// --- Helpers for 3D Collinearity -------------------------------------------
+function is_collinear3(pts) =
+  (len(pts) < 3) ? true
+  : let (a = pts[0], dir = pts[1] - a) _all_col3(pts, a, dir, 2);
+
+function _all_col3(pts, a, dir, i) =
+  (i >= len(pts)) ? true
+  : (norm(cross(pts[i] - a, dir)) <= epsilon) ?
+    _all_col3(pts, a, dir, i + 1)
+  : false;
+
+function find_first_noncollinear3(line, pts, i) =
+  (i >= len(pts)) ? len(pts)
+  : (norm(cross(pts[line[1]] - pts[line[0]], pts[i] - pts[line[0]])) <= epsilon) ?
+    find_first_noncollinear3(line, pts, i + 1)
+  : i;
 
 function plane(points, a, b, c) =
   let (n = unit(cross(points[c] - points[a], points[b] - points[a]))) [n, n * points[a]];
@@ -121,13 +138,15 @@ function convexhull_collinear(points) =
 function min_index(values, min_ = undef, idx_min = undef, i_ = 0) =
   (i_ == 0) ? min_index(values, values[0], 0, 1)
   : (i_ >= len(values)) ? idx_min
-  : (values[i_] < min_) ? min_index(values, values[i_], i_, i_ + 1)
+  : (values[i_] < min_) ?
+    min_index(values, values[i_], i_, i_ + 1)
   : min_index(values, min_, idx_min, i_ + 1);
 
 function max_index(values, max_ = undef, idx_max = undef, i_ = 0) =
   (i_ == 0) ? max_index(values, values[0], 0, 1)
   : (i_ >= len(values)) ? idx_max
-  : (values[i_] > max_) ? max_index(values, values[i_], i_, i_ + 1)
+  : (values[i_] > max_) ?
+    max_index(values, values[i_], i_, i_ + 1)
   : max_index(values, max_, idx_max, i_ + 1);
 
 function remove_elements(arr, to_remove) =
@@ -137,10 +156,21 @@ function remove_internal_edges(edges) =
   [for (h = edges) if (!contains(edges, reverse(h))) h];
 
 function plane_project(p, a, b, c) =
-  let (u = b - a, v = c - a, n = cross(u, v), w = cross(n, u), rel = p - a) [rel * u, rel * w];
+  let (
+    u = b - a,
+    v = c - a,
+    n = cross(u, v),
+    w = cross(n, u),
+    rel = p - a
+  ) [rel * u, rel * w];
 
 function plane_unproject(p, a, b, c) =
-  let (u = b - a, v = c - a, n = cross(u, v), w = cross(n, u)) a + p[0] * u + p[1] * w;
+  let (
+    u = b - a,
+    v = c - a,
+    n = cross(u, v),
+    w = cross(n, u)
+  ) a + p[0] * u + p[1] * w;
 
 function reverse(arr) = [for (i = [len(arr) - 1:-1:0]) arr[i]];
 
@@ -157,7 +187,9 @@ function find_first_noncollinear(line, pts, i) =
 
 function find_first_noncoplanar(pl, pts, i) =
   (i >= len(pts)) ? len(pts)
-  : coplanar(pl, pts[i]) ? find_first_noncoplanar(pl, pts, i + 1) : i;
+  : coplanar(pl, pts[i]) ?
+    find_first_noncoplanar(pl, pts, i + 1)
+  : i;
 
 function distance(pl, p) = pl[0] * p - pl[1];
 function in_front(pl, p) = distance(pl, p) > epsilon;
@@ -166,11 +198,16 @@ function coplanar(pl, p) = abs(distance(pl, p)) <= epsilon;
 function unit(v) = v / norm(v);
 
 function area_2d(a, b, c) =
-  (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1])) / 2;
+  (
+    a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1])
+  ) / 2;
 
-function collinear(a, b, c) = abs(area_2d(a, b, c)) < epsilon;
+function collinear(a, b, c) =
+  abs(area_2d(a, b, c)) < epsilon;
 
-function spherical(cart) = [atan2(cart[1], cart[0]), asin(cart[2])];
+function spherical(cart) =
+  [atan2(cart[1], cart[0]), asin(cart[2])];
+
 function cartesian(sph) =
   [
     cos(sph[1]) * cos(sph[0]),
