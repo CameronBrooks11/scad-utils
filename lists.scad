@@ -58,7 +58,7 @@ function subarray(list, begin = 0, end = -1) =
     set([1,2,3,4], 2, 5) => [1,2,5,4]
 */
 function set(list, i, x) =
-  [for (j = [0:len(list) - 1]) (i == j) ? x : list[j]];
+  [for (j = [0:1:len(list) - 1]) (i == j) ? x : list[j]];
 
 // --- Remove ---------------------------------------------------------------
 /*!
@@ -68,4 +68,4 @@ function set(list, i, x) =
     remove([4,3,2,1], 1) => [4,2,1]
 */
 function remove(list, i) =
-  [for (j = [0:len(list) - 2]) list[ (j < i) ? j : j + 1]];
+  [for (j = [0:1:len(list) - 2]) list[ (j < i) ? j : j + 1]];

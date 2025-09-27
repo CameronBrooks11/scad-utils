@@ -47,13 +47,13 @@ function convex_hull_iterative_2d(points, polygon, remaining, i_ = 0) =
 
 function find_conflicting_segments(points, polygon, point) =
   [
-    for (i = [0:len(polygon) - 1]) let (j = (i + 1) % len(polygon)) if (area_2d(points[polygon[i]], points[polygon[j]], point) < 0) i,
+    for (i = [0:1:len(polygon) - 1]) let (j = (i + 1) % len(polygon)) if (area_2d(points[polygon[i]], points[polygon[j]], point) < 0) i,
   ];
 
 function remove_conflicts_and_insert_point(polygon, conflicts, point) =
   (conflicts[0] == 0) ?
     let (
-      nonconf = [for (i = [0:len(polygon) - 1]) if (!contains(conflicts, i)) i],
+      nonconf = [for (i = [0:1:len(polygon) - 1]) if (!contains(conflicts, i)) i],
       indices = concat(nonconf, (nonconf[len(nonconf) - 1] + 1) % len(polygon))
     ) concat([for (i = indices) polygon[i]], point)
   : let (
@@ -77,7 +77,7 @@ function convexhull3d(points) =
     let (pts2d = [for (p = points) plane_project(p, points[a], points[b], points[c])]) convexhull2d(pts2d)
   : let (
     // build initial tetrahedron
-    remaining = [for (i = [0:len(points) - 1]) if (i != a && i != b && i != c && i != d) i],
+    remaining = [for (i = [0:1:len(points) - 1]) if (i != a && i != b && i != c && i != d) i],
     bc = in_front(pl, points[d]) ? [c, b] : [b, c],
     b2 = bc[0],
     c2 = bc[1],
@@ -150,7 +150,7 @@ function max_index(values, max_ = undef, idx_max = undef, i_ = 0) =
   : max_index(values, max_, idx_max, i_ + 1);
 
 function remove_elements(arr, to_remove) =
-  [for (i = [0:len(arr) - 1]) if (!search(i, to_remove)) arr[i]];
+  [for (i = [0:1:len(arr) - 1]) if (!search(i, to_remove)) arr[i]];
 
 function remove_internal_edges(edges) =
   [for (h = edges) if (!contains(edges, reverse(h))) h];
@@ -177,7 +177,7 @@ function reverse(arr) = [for (i = [len(arr) - 1:-1:0]) arr[i]];
 function contains(arr, el) = (search([el], arr)[0] != []) ? true : false;
 
 function find_conflicts(p, planes) =
-  [for (i = [0:len(planes) - 1]) if (in_front(planes[i], p)) i];
+  [for (i = [0:1:len(planes) - 1]) if (in_front(planes[i], p)) i];
 
 function find_first_noncollinear(line, pts, i) =
   (i >= len(pts)) ? len(pts)

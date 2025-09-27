@@ -86,4 +86,4 @@ function construct_Rt(R, t) =
 // --- Elementwise Operations -------------------------------------------------
 // Hadamard product: works recursively on arrays, multiplies scalars directly.
 function hadamard(a, b) =
-  is_list(a) ? [for (i = [0:len(a) - 1]) hadamard(a[i], b[i])] : a * b;
+  is_list(a) ? [for (i = [0:1:len(a) - 1]) hadamard(a[i], b[i])] : a * b;
