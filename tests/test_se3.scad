@@ -1,5 +1,3 @@
-use <../linalg.scad>
-use <../so3.scad>
 use <../se3.scad>
 
 // --- Unit Test for SE(3) ---------------------------------------------------
