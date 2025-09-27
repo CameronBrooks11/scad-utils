@@ -1,12 +1,14 @@
-// Copyright (c) 2013 Oskar Linde. All rights reserved.
-// License: BSD
-//
-// This library contains simple mirroring functions
-//
-// mirror_x()
-// mirror_y()
-// mirror_z()
+// ============================================================================
+// Mirror Utilities
+// ----------------------------------------------------------------------------
+// Provides simple mirroring modules around the X, Y, and Z axes.
+// Each module duplicates its children and adds a mirrored copy.
+// - mirror_x(): mirror across the YZ-plane (flip X)
+// - mirror_y(): mirror across the XZ-plane (flip Y)
+// - mirror_z(): mirror across the XY-plane (flip Z)
+// ============================================================================
 
+// --- Mirror across X-axis ---------------------------------------------------
 module mirror_x() {
   union() {
     children();
@@ -14,6 +16,7 @@ module mirror_x() {
   }
 }
 
+// --- Mirror across Y-axis ---------------------------------------------------
 module mirror_y() {
   union() {
     children();
@@ -21,6 +24,7 @@ module mirror_y() {
   }
 }
 
+// --- Mirror across Z-axis ---------------------------------------------------
 module mirror_z() {
   union() {
     children();
