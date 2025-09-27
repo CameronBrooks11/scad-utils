@@ -63,7 +63,7 @@ contains simple mirroring functions
 
 example:
 
-```c
+```
 module arrow(l=1,w=.6,t=0.15) {
     mirror_y() polygon([[0,0],[l,0],[l-w/2,w/2],[l-w/2-sqrt(2)*t,w/2],[l-t/2-sqrt(2)*t,t/2],[0,t/2]]);
 }

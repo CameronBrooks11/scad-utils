@@ -1,6 +1,8 @@
 include <../mirror.scad>
 
-// Simple reference shape offset from the origin so the mirror is obvious
+// ---------------------------------------------------------------------------
+// Sample reference shape
+// ---------------------------------------------------------------------------
 module sample_shape() {
   translate([20, 10, 5]) {
     cube([10, 6, 6], center=false);
@@ -8,7 +10,9 @@ module sample_shape() {
   }
 }
 
-// Tiny axes helper for orientation
+// ---------------------------------------------------------------------------
+// Axes helper for orientation
+// ---------------------------------------------------------------------------
 module axes(len = 25, thick = 0.8) {
   // +X axis (red)
   color("red")
@@ -26,39 +30,53 @@ module axes(len = 25, thick = 0.8) {
       cube([thick, thick, len], center=true);
 }
 
-// Arrange three demos side-by-side
+// ---------------------------------------------------------------------------
+// Demonstrations
+// ---------------------------------------------------------------------------
+
+// Mirror across X-axis
 translate([-60, 0, 0]) {
   axes();
-  mirror_x() sample_shape();
+  mirror_x("teal") sample_shape();
 }
 
+// Mirror across Y-axis
 translate([0, 0, 0]) {
   axes();
-  mirror_y() sample_shape();
+  mirror_y("indigo") sample_shape();
 }
 
+// Mirror across Z-axis
 translate([60, 0, 0]) {
   axes();
-  mirror_z() sample_shape();
+  mirror_z("salmon") sample_shape();
 }
 
-// Compare with a single plain mirror
+// Compare with a plain built-in mirror
 translate([-60, -40, 0]) {
   axes();
-  color("orange")
-    union() {
-      sample_shape();
-      mirror([1, 0, 0]) sample_shape();
-    }
+  union() {
+    sample_shape();
+    mirror([1, 0, 0]) color("MediumAquamarine") sample_shape();
+  }
 }
 
-module arrow(l = 1, w = .6, t = 0.15) {
-  mirror_y() polygon([[0, 0], [l, 0], [l - w / 2, w / 2], [l - w / 2 - sqrt(2) * t, w / 2], [l - t / 2 - sqrt(2) * t, t / 2], [0, t / 2]]);
+// 2D arrow example using mirror_y
+module arrow(l = 1, w = 0.6, t = 0.15) {
+  mirror_y("orange")
+    polygon(
+      [
+        [0, 0],
+        [l, 0],
+        [l - w / 2, w / 2],
+        [l - w / 2 - sqrt(2) * t, w / 2],
+        [l - t / 2 - sqrt(2) * t, t / 2],
+        [0, t / 2],
+      ]
+    );
 }
 
-// Compare with a single plain mirror
 translate([60, -40, 0]) {
   axes();
-  color("orange")
-    arrow(l=20, w=10, t=2);
+  arrow(l=20, w=10, t=2);
 }
