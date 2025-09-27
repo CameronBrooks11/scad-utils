@@ -53,3 +53,13 @@ echo(
   hadamard([[1, 2], [3, 4]], [[5, 6], [7, 8]])
 );
 // expect [[5,12],[21,32]]
+
+// --- Matrix utilities -------------------------------------------------------
+B = [[2, 0], [0, 3]];
+echo("matrix_power(B,0) =", matrix_power(B, 0)); // expect identity2 (approximated as [[1,0],[0,1]])
+echo("matrix_power(B,2) =", matrix_power(B, 2)); // expect [[4,0],[0,9]]
+
+C = [[1, 2], [3, 4]];
+echo("det(C) =", det(C)); // expect -2
+echo("matrix_invert(C) =", matrix_invert(C));
+// expect [[-2,1],[1.5,-0.5]]
