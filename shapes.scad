@@ -40,4 +40,4 @@ function rectangle_profile(size = [1, 1]) =
     [size[0] / 2, -size[1] / 2],
   ];
 
-// TODO: Move rectangle and rounded rectangle from extrusion.scad
+// FIXME: Move rectangle and rounded rectangle from extrusion

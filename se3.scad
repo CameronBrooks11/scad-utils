@@ -38,7 +38,8 @@ function se3_exp_2_0(t, w, theta_sq) =
   se3_exp_23(
     so3_exp_2(theta_sq),
     C=(1.0 - theta_sq / 20) / 6,
-    t=t, w=w
+    t=t,
+    w=w
   );
 
 // 3rd order approximation
@@ -53,7 +54,8 @@ function se3_exp_3_0(t, w, theta_deg, inv_theta) =
   se3_exp_23(
     so3_exp_3_0(theta_deg=theta_deg, inv_theta=inv_theta),
     C=(1 - sin(theta_deg) * inv_theta) * (inv_theta * inv_theta),
-    t=t, w=w
+    t=t,
+    w=w
   );
 
 // Shared expansion for orders 2–3

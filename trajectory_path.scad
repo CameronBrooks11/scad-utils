@@ -31,14 +31,14 @@ function right_multiply(as, b, i_ = 0) =
   : concat([as[i_] * b], right_multiply(as, b, i_ + 1));
 
 // --- Single-trajectory quantization ----------------------------------------
-// Produces an array of 4x4 transforms sampled along one 6D twist `trajectory`.
+// quantize_trajectory: produces an array of 4x4 transforms sampled along one 6D twist.
 // If `steps` is provided, it overrides `step` and distributes uniformly.
 // If `step` is provided, samples start at `start_position` and advance by `step`.
 // `start_position` and `step` are in the units of the translation norm.
 //
 // Notes:
-// - Length is computed from the translational part only: norm(take3(trajectory))
-// - For steps==1, returns the transform at the path end (t=1).
+//   - Length is computed from the translational part only: norm(take3(trajectory))
+//   - For steps==1, returns the transform at the path end (t=1).
 function quantize_trajectory(
   trajectory,
   step = undef,

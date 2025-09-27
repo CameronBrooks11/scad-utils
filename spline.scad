@@ -1,27 +1,26 @@
 // ============================================================================
 // Spline Utilities
 // ----------------------------------------------------------------------------
-// Author: Sergei Kuzmin, 2014
-// License: BSD
-//
 // Provides cubic spline and Bezier curve utilities for OpenSCAD.
 //
 // Functions:
-// - spline_args(p, closed=false, v1=undef, v2=undef)
-//     → compute spline coefficient matrices for given control points
-// - spline(s, t)
-//     → evaluate spline at parameter t
-// - spline_tan(), spline_tan_unit()
-//     → evaluate tangent vector
-// - spline_d2(), spline_binormal_unit(), spline_normal_unit()
-//     → evaluate higher derivatives and Frenet frame
-// - spline_transform()
-//     → construct SE3 transform aligned to spline
-//
-// - bezier3_args(p, symmetric=false)
-//     → construct cubic Bezier coefficient matrices
+//   - spline_args(p, closed=false, v1=undef, v2=undef)
+//       → compute spline coefficient matrices for given control points
+//   - spline(s, t)
+//       → evaluate spline at parameter t
+//   - spline_tan(), spline_tan_unit()
+//       → evaluate tangent vector
+//   - spline_d2(), spline_binormal_unit(), spline_normal_unit()
+//       → evaluate higher derivatives and Frenet frame
+//   - spline_transform()
+//       → construct SE3 transform aligned to spline
+//   - bezier3_args(p, symmetric=false)
+//       → construct cubic Bezier coefficient matrices
 //
 // Internal helpers implement determinant, matrix inversion, etc.
+//
+// Author: Sergei Kuzmin, 2014
+// License: BSD
 // ============================================================================
 
 use <linalg.scad>
@@ -49,8 +48,8 @@ function matrix_power(m, n) =
 function det(m) =
   let (r = [for (i = [0:len(m) - 1]) i]) det_help(m, 0, r);
 
-// Construction indices list is inefficient, but currently there is no way to imperatively
-// assign to a list element
+// Construction indices list is inefficient, but currently there is no way to
+// imperatively assign to a list element
 function det_help(m, i, r) =
   len(r) == 0 ? 1
   : m[len(m) - len(r)][r[i]] * det_help(m, 0, remove(r, i)) - (i + 1 < len(r) ? det_help(m, i + 1, r) : 0);
@@ -99,8 +98,8 @@ function spline_args(p, closed = false, v1 = undef, v2 = undef) =
     ],
     sn = matrix_invert(q4 + q3 * matrix_power(qn1i2, pcnt - 2)) * (un - q3 * q1inv * spline_helper(0, pcnt, p))
   )
-  // result[i+1] recurrently defines result[i]. This is O(n) runtime with imperative language and 
-  // may be O(n^2) if OpenSCAD doesn't cache spline_si(i+1).
+  // result[i+1] recurrently defines result[i]. This is O(n) runtime with 
+  // imperative language and may be O(n^2) if OpenSCAD doesn't cache spline_si(i+1).
   [for (i = [0:pcnt - 2]) spline_si(i, pcnt - 2, p, sn)];
 
 // Helper recursion for spline_args
@@ -119,12 +118,14 @@ function spline_si(i, n, p, sn) =
 
 // --- Bezier Utilities -------------------------------------------------------
 // Takes array of (3n+1) points or (2n + 2) points, if tangent segments are symmetric.
-// For non-symmetric version input is: point0, normal0, neg_normal1, point1, normal1, ... neg_normal_n, point_n
-// For symmetric version: point0, normal0, point1, normal1, ... , normal_n_sub_1, point_n
+// For non-symmetric version input is: 
+//   point0, normal0, neg_normal1, point1, normal1, ... neg_normal_n, point_n
+// For symmetric version: 
+//   point0, normal0, point1, normal1, ... , normal_n_sub_1, point_n
 // In the second case second tangent is constructed from the next tangent by symmetric map.
-// I.e. if current points are p0,p1,p2 then anchor points are p0 and p2, first tangent defined by p1-p0,
-// second tangent defined by p3-p2.
-// Return array of coefficients accepted by spline(), spline_tan() and similar   
+// I.e. if current points are p0,p1,p2 then anchor points are p0 and p2, first tangent 
+// defined by p1-p0, second tangent defined by p3-p2.
+// Return array of coefficients accepted by spline(), spline_tan() and similar
 function bezier3_args(p, symmetric = false) =
   let (step = symmetric ? 2 : 3) [
       for (i = [0:step:len(p) - 3]) [[1, 0, 0, 0], [-3, 3, 0, 0], [3, -6, 3, 0], [-1, 3, -3, 1]] * (
@@ -136,7 +137,8 @@ function bezier3_args(p, symmetric = false) =
 // --- Evaluation -------------------------------------------------------------
 // Evaluate spline/Bezier and derivatives
 // s - spline arguments calculated by spline_args
-// t - defines point on curve. each segment length is 1. I.e. t= 0..1 is first segment, t=1..2 - second.   
+// t - defines point on curve. Each segment length is 1. 
+//     i.e. t= 0..1 is first segment, t=1..2 - second.   
 function spline(s, t) =
   let (
     i = t >= len(s) ? len(s) - 1 : floor(t),

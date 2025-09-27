@@ -13,6 +13,7 @@ epsilon = 1e-9;
 
 // --- Vector Constructors ----------------------------------------------------
 function vec3(p) = (len(p) < 3) ? concat(p, 0) : p;
+
 function vec4(p) =
   let (v3 = vec3(p)) (len(v3) < 4) ? concat(v3, 1) : v3;
 
@@ -36,6 +37,7 @@ function identity4() =
 
 // --- Vector Access Helpers --------------------------------------------------
 function take3(v) = [v[0], v[1], v[2]];
+
 function tail3(v) = [v[3], v[4], v[5]];
 
 // --- Matrix Part Extraction -------------------------------------------------
@@ -50,6 +52,7 @@ function translation_part(m) = [m[0][3], m[1][3], m[2][3]];
 
 // --- Rotation Metrics -------------------------------------------------------
 function rot_trace(m) = m[0][0] + m[1][1] + m[2][2];
+
 function rot_cos_angle(m) = (rot_trace(m) - 1) / 2;
 
 // --- Matrix Transpose -------------------------------------------------------
