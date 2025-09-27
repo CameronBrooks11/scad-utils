@@ -11,7 +11,6 @@
 //   - rotationm(...) builds a 3x3 rotation matrix from angles
 // ----------------------------------------------------------------------------
 // Dependencies: so3.scad
-// Author(s): adapted and cleaned up from original scad-utils
 // ============================================================================
 
 use <so3.scad>
