@@ -24,7 +24,6 @@
 // ============================================================================
 
 use <linalg.scad>
-use <lists.scad>
 
 // --- Predefined Matrices ----------------------------------------------------
 q1 = [[1, 0, 0, 0], [1, 1, 1, 1], [0, 1, 2, 3], [0, 0, 1, 3]];
@@ -34,37 +33,6 @@ qn1i2 = -q1inv * q2;
 
 z3 = [0, 0, 0];
 z4 = [0, 0, 0, 0];
-
-// --- Matrix Utilities -------------------------------------------------------
-
-// Compute matrix power
-function matrix_power(m, n) =
-  n == 0 ? (len(m) == 3 ? identity3() : identity4())
-  : n == 1 ? m
-  : (n % 2 == 1) ? matrix_power(m * m, floor(n / 2)) * m
-  : matrix_power(m * m, n / 2);
-
-// Determinant (recursive Laplace expansion)
-function det(m) =
-  let (r = [for (i = [0:len(m) - 1]) i]) det_help(m, 0, r);
-
-// Construction indices list is inefficient, but currently there is no way to
-// imperatively assign to a list element
-function det_help(m, i, r) =
-  len(r) == 0 ? 1
-  : m[len(m) - len(r)][r[i]] * det_help(m, 0, remove(r, i)) - (i + 1 < len(r) ? det_help(m, i + 1, r) : 0);
-
-// Matrix inversion (adjugate method)
-function matrix_invert(m) =
-  let (r = [for (i = [0:len(m) - 1]) i]) [
-    for (i = r) [
-      for (j = r) ( (i + j) % 2 == 0 ? 1 : -1) * matrix_minor(m, 0, remove(r, j), remove(r, i)),
-    ],
-  ] / det(m);
-
-function matrix_minor(m, k, ri, rj) =
-  let (len_r = len(ri)) len_r == 0 ? 1
-  : m[ri[0]][rj[k]] * matrix_minor(m, 0, remove(ri, 0), remove(rj, k)) - (k + 1 < len_r ? matrix_minor(m, k + 1, ri, rj) : 0);
 
 // --- Spline Construction ----------------------------------------------------
 
