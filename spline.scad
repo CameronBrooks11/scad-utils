@@ -47,7 +47,7 @@ function spline_args(p, closed = false, v1 = undef, v2 = undef) =
     : [
       z4,
       z4,
-      v1 == undef ? [0, 0, 1, 0] : [0, 1, 0, 0],
+      is_undef(v1) ? [0, 0, 1, 0] : [0, 1, 0, 0],
       z4,
     ],
     q4 = closed ? q1
@@ -55,14 +55,14 @@ function spline_args(p, closed = false, v1 = undef, v2 = undef) =
       [1, 0, 0, 0],
       [1, 1, 1, 1],
       z4,
-      v2 == undef ? [0, 0, 1, 3] : [0, 1, 2, 3],
+      is_undef(v2) ? [0, 0, 1, 3] : [0, 1, 2, 3],
     ],
     pcnt = closed ? len(p) + 1 : len(p),
     un = [
       p[pcnt - 2],
       p[closed ? 0 : pcnt - 1],
-      v1 == undef ? z4 : v1,
-      v2 == undef ? z4 : v2,
+      is_undef(v1) ? z4 : v1,
+      is_undef(v2) ? z4 : v2,
     ],
     sn = matrix_invert(q4 + q3 * matrix_power(qn1i2, pcnt - 2)) * (un - q3 * q1inv * spline_helper(0, pcnt, p))
   )

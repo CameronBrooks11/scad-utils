@@ -2,7 +2,8 @@
 
 Utility libraries for OpenSCAD.  
 This collection provides reusable math, geometry, and transformation tools for parametric modeling.  
-All modules are documented, consistently structured, and tested via dedicated `.scad` test files.
+All modules are documented, consistently structured, and tested via dedicated `.scad` test files.  
+A list of projects making use of these utilities can be viewed in the [projects](#projects-using-scad-utils) section below.
 
 ---
 
@@ -285,6 +286,8 @@ $fn = 32;
 ### Mirror Operations
 
 ```scad
+use <mirror.scad>
+
 module arrow(l=1, w=0.6, t=0.15) {
   mirror_y("orange")
     polygon([[0,0], [l,0], [l-w/2,w/2],
@@ -310,7 +313,7 @@ polyhedron(points=points_3d, faces=faces);
 ```scad
 use <spline.scad>
 
-points = [[0,0,0], [10,5,0], [20,0,5], [30,10,0]];
+points = [[0,0,0], [10,10,0], [20,0,5], [30,10,0]];
 spline_data = spline_args(points, closed=true);
 
 for (t = [0:0.1:len(spline_data)])
@@ -364,3 +367,10 @@ Each module includes comprehensive test files in the `tests/` directory:
 - **Integration Tests:** Multi-module workflows (splines with SE(3), trajectory chains)
 
 **Running Tests:** Load test files directly in OpenSCAD to see both console output and visual results.
+
+## Projects using `scad-utils`
+
+- [openscad/list-comprehension-demos](https://github.com/openscad/list-comprehension-demos) uses `lists.scad`, `linalg.scad`, `transformations.scad`, `shape.scad`, `trajectory.scad`, and `trajectory_path.scad`
+- [adrianschlatter/threadlib](https://github.com/adrianschlatter/threadlib) uses `lists.scad` and `transformations.scad` through [MisterHW/IoP-satellite](https://github.com/MisterHW/IoP-satellite)
+- [likeablob/parametric-stackable-box](https://github.com/likeablob/parametric-stackable-box)
+- [likeablob/misc-printable-accessories](https://github.com/likeablob/misc-printable-accessories)

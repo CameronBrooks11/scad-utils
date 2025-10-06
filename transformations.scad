@@ -27,13 +27,36 @@ use <lists.scad>
 //   rotation(xyz=[90,0,0])   // rotate 90° about X
 //   rotation(axis=[0,0,45])  // rotate 45° about Z
 function rotation(xyz = undef, axis = undef) =
-  xyz != undef && axis != undef ? undef
-  : // cannot define both
-  xyz == undef ?
+  // disallow both forms together
+  (!is_undef(xyz) && !is_undef(axis)) ?
+    undef
+  :
+  // pure axis-angle exponential form
+  (is_undef(xyz) && !is_undef(axis)) ?
     se3_exp([0, 0, 0, axis[0], axis[1], axis[2]])
-  : len(xyz) == undef ?
+  :
+  // shorthand for single-angle rotation about Z
+  (is_undef(axis) && !is_undef(xyz) && !is_list(xyz)) ?
     rotation(axis=[0, 0, xyz])
-  : (len(xyz) >= 3 ? rotation(axis=[0, 0, xyz[2]]) : identity4()) * (len(xyz) >= 2 ? rotation(axis=[0, xyz[1], 0]) : identity4()) * (len(xyz) >= 1 ? rotation(axis=[xyz[0], 0, 0]) : identity4());
+  :
+  // full Euler xyz case
+  (is_undef(axis) && is_list(xyz)) ?
+    (
+      len(xyz) >= 3 ?
+        rotation(axis=[0, 0, xyz[2]])
+      : identity4()
+    ) * (
+      len(xyz) >= 2 ?
+        rotation(axis=[0, xyz[1], 0])
+      : identity4()
+    ) * (
+      len(xyz) >= 1 ?
+        rotation(axis=[xyz[0], 0, 0])
+      : identity4()
+    )
+  :
+  // fallback
+  identity4();
 
 // --- Scaling ----------------------------------------------------------------
 // Creates a scaling matrix: scaling([sx, sy, sz])
