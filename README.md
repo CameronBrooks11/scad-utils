@@ -372,5 +372,5 @@ Each module includes comprehensive test files in the `tests/` directory:
 
 - [openscad/list-comprehension-demos](https://github.com/openscad/list-comprehension-demos) uses `lists.scad`, `linalg.scad`, `transformations.scad`, `shape.scad`, `trajectory.scad`, and `trajectory_path.scad`
 - [adrianschlatter/threadlib](https://github.com/adrianschlatter/threadlib) uses `lists.scad` and `transformations.scad` through [MisterHW/IoP-satellite](https://github.com/MisterHW/IoP-satellite)
-- [likeablob/parametric-stackable-box](https://github.com/likeablob/parametric-stackable-box)
-- [likeablob/misc-printable-accessories](https://github.com/likeablob/misc-printable-accessories)
+- [likeablob/parametric-stackable-box](https://github.com/likeablob/parametric-stackable-box) uses `morphology.scad` and `mirror.scad`
+- [likeablob/misc-printable-accessories](https://github.com/likeablob/misc-printable-accessories) uses `morphology.scad` and `mirror.scad`
